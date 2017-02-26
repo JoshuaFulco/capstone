@@ -1,0 +1,295 @@
+<?xml version="1.0"?>
+<!-- Articulated (Revolute x3) Manipulator -->
+<robot name="artbot" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- Constants for robot dimensions (in meters) -->
+  <xacro:property name="PI" value="3.1415926535897931"/>
+  <xacro:property name="width1" value="0.280" /> <!-- Link 1, the stationary base -->
+  <xacro:property name="height1" value="0.160" /> <!-- Link 1 -->
+  <xacro:property name="length1" value="0.220" /> <!-- Link 1 -->
+  <xacro:property name="width2" value="0.348" /> <!-- Link 2, the rotating "shoulder" -->
+  <xacro:property name="height2" value="0.186" /> <!-- Link 2 -->
+  <xacro:property name="length2" value="0.198" /> <!-- Link 2 -->
+  <xacro:property name="length3" value="0.550" /> <!-- Link 3, the first arm section -->
+  <xacro:property name="radius3" value="0.0445" /> <!-- Link 3 -->
+  <xacro:property name="length4" value="0.450" /> <!-- Link 4, the second arm section -->
+  <xacro:property name="radius4" value="0.0445" /> <!-- Link 4 -->
+
+  <!-- Constants for robot inertias (in kilograms) -->
+  <xacro:property name="mass1" value="${8.3936 + 4.8487}" /> <!-- Link 2 -->
+  <xacro:property name="mass2" value="${1.7251 + 0.4809}" /> <!-- Link 3 -->
+  <xacro:property name="mass3" value="${1.0912 + 2.0824 + 0.3067 + 0.4278 + 0.0557}" /> <!-- Link 4 -->
+
+  <!-- Import all Gazebo-customization elements, including Gazebo colors -->
+  <xacro:include filename="$(find artbot_description)/urdf/artbot.gazebo" />
+  <!-- Import Rviz colors -->
+  <xacro:include filename="$(find artbot_description)/urdf/materials.xacro" />
+
+  <!-- Used for fixing robot to Gazebo 'base_link' -->
+  <link name="world"/>
+
+  <joint name="fixed" type="fixed">
+    <parent link="world"/>
+    <child link="link1"/>
+  </joint>
+
+  <!-- Base Link -->
+  <link name="link1">
+    <collision>
+      <origin xyz="0 0 ${height1/2}" rpy="0 0 0"/>
+      <geometry>
+	<box size="${length1} ${width1} ${height1}"/>
+      </geometry>
+    </collision>
+
+    <visual>
+      <origin xyz="0 0 ${height1/2}" rpy="0 0 0"/>
+      <geometry>
+	<box size="${length1} ${width1} ${height1}"/>
+      </geometry>
+      <material name="grey"/>
+    </visual>
+
+  <!-- Added visual element at base -->
+    <visual>
+      <origin xyz="${length1/2} 0 ${height1/2}" rpy="0 0 0"/>
+      <geometry>
+	<cylinder length="${height1}" radius="${width1/2}"/>
+      </geometry>
+      <material name="grey"/>
+    </visual>
+
+  <!-- Inertial values unimportant for stationary base -->
+    <inertial>
+      <origin xyz="0 0 ${height1/2}" rpy="0 0 0"/>
+      <mass value="1"/>
+      <inertia
+	  ixx="1.0" ixy="0.0" ixz="0.0"
+	  iyy="1.0" iyz="0.0"
+	  izz="1.0"/>
+    </inertial>
+  </link>
+
+  <joint name="joint1" type="continuous">
+    <parent link="link1"/>
+    <child link="link2"/>
+    <origin xyz="${length1/2} 0 ${height1}" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <dynamics damping="0.7"/>
+  </joint>
+
+  <!-- Shoulder Link -->
+  <link name="link2">
+    <collision>
+      <origin xyz="0 0 ${height2/4}" rpy="0 0 0"/>
+      <geometry>
+	<box size="${length2} ${width2} ${height2/2}"/>
+      </geometry>
+    </collision>
+
+    <visual>
+      <origin xyz="0 0 ${height2/4}" rpy="0 0 0"/>
+      <geometry>
+	<box size="${length2} ${width2} ${height2/2}"/>
+      </geometry>
+      <material name="grey"/>
+    </visual>
+
+  <!-- Added visual elements at shoulder joint -->
+
+  <!-- Shoulder cylinder 1 -->
+    <visual>
+      <origin xyz="0 ${0.3*width2} ${height2}" rpy="${PI/2} 0 0"/>
+      <geometry>
+	<cylinder length="${0.25*width2}" radius="${0.9*height2/2}"/>
+      </geometry>
+      <material name="grey"/>
+    </visual>
+
+  <!-- Shoulder rectangle 1 -->
+    <visual>
+      <origin xyz="0 ${0.3*width2} ${height2/2}" rpy="0 0 0"/>
+      <geometry>
+	<box size="${0.9*length2} ${0.3*width2} ${height2}"/>
+      </geometry>
+      <material name="grey"/>
+    </visual>
+
+  <!-- Shoulder rotation -->
+  <!--
+    <visual>
+      <origin xyz="0 0 ${height2}" rpy="${PI/2} 0 0"/>
+      <geometry>
+	<cylinder length="${0.5*width2}" radius="${radius3}"/>
+      </geometry>
+      <material name="blue"/>
+    </visual>
+  -->
+
+  <!-- Shoulder cylinder 2 -->
+    <visual>
+      <origin xyz="0 ${-0.3*width2} ${height2}" rpy="${PI/2} 0 0"/>
+      <geometry>
+	<cylinder length="${0.25*width2}" radius="${0.9*height2/2}"/>
+      </geometry>
+      <material name="grey"/>
+    </visual>
+
+  <!-- Shoulder rectangle 2 -->
+    <visual>
+      <origin xyz="0 ${-0.3*width2} ${height2/2}" rpy="0 0 0"/>
+      <geometry>
+	<box size="${0.9*length2} ${0.3*width2} ${height2}"/>
+      </geometry>
+      <material name="grey"/>
+    </visual>
+
+  <!-- Shoulder base cylinder -->
+    <visual>
+      <origin xyz="0 0 ${height2/4}" rpy="0 0 0"/>
+      <geometry>
+	<cylinder length="${height2/2}" radius="${width1/2}"/>
+      </geometry>
+      <material name="grey"/>
+    </visual>
+
+  <!-- Simplified inertia of "shoulder" assuming solid uniform box -->
+    <inertial>
+      <origin xyz="0 0 ${height2/2}" rpy="0 0 0"/>
+      <mass value="${mass1}"/>
+      <inertia
+	  ixx="${mass1*(height2*height2+width2*width2)/12}" ixy="0.0" ixz="0.0"
+	  iyy="${mass1*(height2*height2+length2*length2)/12}" iyz="0.0"
+	  izz="${mass1*(length2*length2+width2*width2)/12}"/>
+    </inertial>
+  </link>
+
+  <joint name="joint2" type="continuous">
+    <parent link="link2"/>
+    <child link="link3"/>
+    <origin xyz="0 0 ${height2}" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <dynamics damping="0.7"/>
+  </joint>
+
+  <!-- First Arm Section Link -->
+  <link name="link3">
+    <collision>
+      <origin xyz="0 0 ${length3/2}" rpy="0 0 0"/>
+      <geometry>
+	<cylinder length="${length3 - 2*radius3}" radius="${radius3}"/>
+      </geometry>
+    </collision>
+
+    <visual>
+      <origin xyz="0 0 ${length3/2}" rpy="0 0 0"/>
+      <geometry>
+	<cylinder length="${length3}" radius="${radius3}"/>
+      </geometry>
+      <material name="grey"/>
+    </visual>
+
+  <!-- Added visual elements at second joint -->
+
+  <!-- Shoulder rotation -->
+    <visual>
+      <origin xyz="0 0 0" rpy="${PI/2} 0 0"/>
+      <geometry>
+	<cylinder length="${0.5*width2}" radius="${radius3}"/>
+      </geometry>
+      <material name="blue"/>
+    </visual>
+
+  <!-- Simplified inertia of first arm cylinder, assuming a narrow rod -->
+    <inertial>
+      <origin xyz="0 0 ${length3/2}" rpy="0 0 0"/>
+      <mass value="${mass2}"/>
+      <inertia
+	  ixx="${mass2*length3*length3/12}" ixy="0.0" ixz="0.0"
+	  iyy="0.0" iyz="0.0"
+	  izz="${mass2*length3*length3/12}"/>
+    </inertial>
+  </link>
+
+  <joint name="joint3" type="continuous">
+    <parent link="link3"/>
+    <child link="link4"/>
+    <origin xyz="0 0 ${length3}" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <dynamics damping="0.7"/>
+  </joint>
+
+  <!-- Second Arm Section Link -->
+  <link name="link4">
+    <collision>
+      <origin xyz="0 0 ${length4/2}" rpy="0 0 0"/>
+      <geometry>
+	<cylinder length="${length4 - 2*radius4}" radius="${radius4}"/>
+      </geometry>
+    </collision>
+
+    <visual>
+      <origin xyz="0 0 ${length4/2}" rpy="0 0 0"/>
+      <geometry>
+	<cylinder length="${length4}" radius="${radius4}"/>
+      </geometry>
+      <material name="grey"/>
+    </visual>
+
+  <!-- Added visual elements at third joint -->
+
+  <!-- Shoulder rotation -->
+    <visual>
+      <origin xyz="0 0 0" rpy="${PI/2} 0 0"/>
+      <geometry>
+	<cylinder length="${2*radius4}" radius="${radius4}"/>
+      </geometry>
+      <material name="blue"/>
+    </visual>
+
+  <!-- Simplified inertia of second arm cylinder, assuming a narrow rod -->
+    <inertial>
+      <origin xyz="0 0 ${length4/2}" rpy="0 0 0"/>
+      <mass value="${mass3}"/>
+      <inertia
+	  ixx="${mass3*length4*length4/12}" ixy="0.0" ixz="0.0"
+	  iyy="1.0" iyz="0.0"
+	  izz="${mass3*length4*length4/12}"/>
+    </inertial>
+  </link>
+
+
+  <transmission name="tran1">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="joint1">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="motor1">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+  <transmission name="tran2">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="joint2">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="motor2">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+  <transmission name="tran3">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="joint3">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="motor3">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+</robot>

@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package>
+  <name>artbot_description</name>
+  <version>0.1.0</version>
+  <description>The artbot_description package</description>
+
+  <maintainer email="cmgladding@wpi.edu">Colin Gladding</maintainer>
+
+  <license>BSD</license>
+
+  <!-- Package based on examples available at these URLs !-->
+  <url type="website">http://http://gazebosim.org/w/index.php?title=Tutorials/1.9/Using_A_URDF_In_Gazebo</url>
+  <url type="repository">https://github.com/osrf/gazebo_ros_demos</url>
+
+  <author email="cmgladding@wpi.edu">Colin Gladding</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <export>
+  </export>
+</package>

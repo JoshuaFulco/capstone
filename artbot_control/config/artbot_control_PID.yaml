@@ -1,0 +1,19 @@
+artbot:
+  # Publish all joint states -----------------------------------
+  joint_state_controller:
+    type: joint_state_controller/JointStateController
+    publish_rate: 50  
+  
+  # Position Controllers ---------------------------------------
+  joint1_position_controller:
+    type: artbot_control/PID_Controller
+    joint: joint1
+
+  joint2_position_controller:
+    type: artbot_control/PID_Controller
+    joint: joint2
+
+  joint3_position_controller:
+    type: artbot_control/PID_Controller
+    joint: joint3
+

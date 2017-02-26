@@ -1,0 +1,9 @@
+<library path="lib/libartbot_control">
+
+  <class name="artbot_control/PID_Controller" type="artbot_control::PID_Controller" base_class_type="controller_interface::ControllerBase">
+    <description>
+      A basic PID Controller. It expects an EffortJointInterface type of hardware interface.
+    </description>
+  </class>
+
+</library>
